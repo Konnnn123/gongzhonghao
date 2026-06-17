@@ -118,7 +118,11 @@ export function EditorToolbar({ editor }: Props) {
       <div className="w-px h-5 bg-border mx-1" />
 
       {/* 文字样式 */}
-      <button onClick={() => editor.chain().focus().toggleBold().run()} className={btn(editor.isActive('bold'))}>
+      <button onClick={() => {
+        const { brandColor } = useEditorStore.getState().typography
+        const theme = deriveThemeConfig(brandColor)
+        editor.chain().focus().toggleBold({ color: theme.headingColor }).run()
+      }} className={btn(editor.isActive('wechatBold'))}>
         <Bold className="w-4 h-4" />
       </button>
       <button onClick={() => editor.chain().focus().toggleItalic().run()} className={btn(editor.isActive('italic'))}>

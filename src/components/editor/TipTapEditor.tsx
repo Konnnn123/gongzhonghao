@@ -10,6 +10,7 @@ import { useEditorStore } from '../../store/useEditorStore'
 import { markdownToHtml } from '../../core/editor/markdownConvert'
 import { WeChatHeading } from '../../core/extensions/WeChatHeading'
 import { WeChatHighlight } from '../../core/extensions/WeChatHighlight'
+import { WeChatBold } from '../../core/extensions/WeChatBold'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
   WeChatParagraph, WeChatBulletList, WeChatOrderedList,
@@ -62,13 +63,19 @@ function syncGlobalState(editor: any) {
       }
     }
 
-    // 标记 → 高亮颜色
+    // 标记 → 高亮 + 加粗颜色
     if (node.marks) {
       node.marks = node.marks.map((mark: any) => {
         if (mark.type === 'wechatHighlight') {
           return {
             ...mark,
             attrs: { color: theme.highlightBg, textColor: theme.highlightText },
+          }
+        }
+        if (mark.type === 'wechatBold') {
+          return {
+            ...mark,
+            attrs: { color: theme.headingColor },
           }
         }
         return mark
@@ -113,7 +120,7 @@ export function TipTapEditor() {
     extensions: [
       StarterKit.configure({
         heading: { levels: [1] },
-        underline: false, highlight: false,
+        bold: false, underline: false, highlight: false,
         paragraph: false, bulletList: false, orderedList: false,
         listItem: false, blockquote: false, horizontalRule: false,
       }),
@@ -121,6 +128,7 @@ export function TipTapEditor() {
       WeChatBulletList, WeChatOrderedList, WeChatListItem,
       WeChatBlockquote, WeChatHorizontalRule,
       WeChatHeading,
+      WeChatBold,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
