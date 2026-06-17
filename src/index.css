@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #1e80ff;
+  --color-brand-light: rgba(30, 128, 255, 0.1);
+  --color-brand-dark: #0958d9;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f7f8fa;
+  --color-border: #e5e6eb;
+  --color-text-primary: #1d2129;
+  --color-text-secondary: #4e5969;
+  --color-text-muted: #86909c;
+  --color-danger: #f53f3f;
+  --color-success: #00b42a;
+  --font-sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-surface-secondary);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c9cdd4;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #86909c;
+}
+
+/* Markdown 编辑器 textarea */
+.markdown-editor {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.8;
+  tab-size: 2;
+  resize: none;
+}
+
+/* 预览区域的基础排版 */
+#preview-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* 拖拽上传区域动画 */
+.upload-drop-active {
+  border-color: var(--color-brand) !important;
+  background: var(--color-brand-light) !important;
+}
