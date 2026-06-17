@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -9,7 +9,7 @@ import TiptapImage from '@tiptap/extension-image'
 import { useEditorStore } from '../../store/useEditorStore'
 import { markdownToHtml } from '../../core/editor/markdownConvert'
 import { WeChatHeading } from '../../core/extensions/WeChatHeading'
-import { WeChatHighlight, syncHighlightColor } from '../../core/extensions/WeChatHighlight'
+import { WeChatHighlight } from '../../core/extensions/WeChatHighlight'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
   WeChatParagraph, WeChatBulletList, WeChatOrderedList,
@@ -18,56 +18,76 @@ import {
 import { deriveThemeConfig } from '../../core/themes/themeConfigs'
 import { EditorToolbar } from './EditorToolbar'
 
-/** 应用主题到整个文档：标题 + 高亮 + 段落样式 */
-function applyThemeToDocument(editor: any) {
-  if (!editor?.view) return
+/**
+ * JSON 状态重构法 —— 废弃 tr 遍历，直接修改 JSON 树后 setContent
+ * 绝对可靠：不依赖 ProseMirror Transaction API
+ */
+function syncGlobalState(editor: any) {
+  if (!editor) return
   const { h2Style, h3Style, typography } = useEditorStore.getState()
   const theme = deriveThemeConfig(typography.brandColor)
-  const { state, view } = editor
-  const tr = state.tr
-  let modified = false
+  const json = editor.getJSON()
 
-  state.doc.descendants((node: any, pos: number) => {
-    // 1. 更新 WeChatHeading
-    if (node.type.name === 'wechatHeading') {
-      const newThemeStyle = node.attrs.headingLevel === 2 ? h2Style : h3Style
-      if (node.attrs.brandColor !== theme.headingColor || node.attrs.themeStyle !== newThemeStyle) {
-        tr.setNodeMarkup(pos, undefined, {
-          ...node.attrs,
-          brandColor: theme.headingColor,
-          themeStyle: newThemeStyle,
-        })
-        modified = true
+  // 记住光标
+  const { from, to } = editor.state.selection
+
+  // 递归修改 JSON 树
+  const traverse = (node: any) => {
+    // 段落 → 字号/行高/段间距
+    if (node.type === 'paragraph') {
+      node.attrs = {
+        ...node.attrs,
+        fontSize: `${typography.fontSize}px`,
+        lineHeight: String(typography.lineHeight),
+        marginBottom: `${typography.paragraphSpacing}px`,
       }
     }
 
-    // 2. 更新 WeChatParagraph 属性（字号/行高/段间距）
-    if (node.type.name === 'paragraph') {
-      const fs = `${typography.fontSize}px`
-      const lh = String(typography.lineHeight)
-      const mb = `${typography.paragraphSpacing}px`
-      if (node.attrs.fontSize !== fs || node.attrs.lineHeight !== lh || node.attrs.marginBottom !== mb) {
-        tr.setNodeMarkup(pos, undefined, { ...node.attrs, fontSize: fs, lineHeight: lh, marginBottom: mb })
-        modified = true
+    // 列表项 → 字号/行高
+    if (node.type === 'listItem') {
+      node.attrs = {
+        ...node.attrs,
+        fontSize: `${typography.fontSize}px`,
+        lineHeight: String(typography.lineHeight),
       }
     }
 
-    // 3. 更新 WeChatHighlight 标记
+    // 标题 → 品牌色 + 样式
+    if (node.type === 'wechatHeading') {
+      const level = node.attrs?.headingLevel || 2
+      node.attrs = {
+        ...node.attrs,
+        brandColor: theme.headingColor,
+        themeStyle: level === 2 ? h2Style : h3Style,
+      }
+    }
+
+    // 标记 → 高亮颜色
     if (node.marks) {
-      const markType = state.schema.marks.weChatHighlight
-      if (markType) {
-        for (const mark of node.marks) {
-          if (mark.type.name === 'wechatHighlight' && mark.attrs.color !== theme.highlightBg) {
-            tr.removeMark(pos, pos + node.nodeSize, mark)
-            tr.addMark(pos, pos + node.nodeSize, markType.create({ color: theme.highlightBg }))
-            modified = true
+      node.marks = node.marks.map((mark: any) => {
+        if (mark.type === 'wechatHighlight') {
+          return {
+            ...mark,
+            attrs: { color: theme.highlightBg, textColor: theme.highlightText },
           }
         }
-      }
+        return mark
+      })
     }
-  })
 
-  if (modified) view.dispatch(tr)
+    // 递归
+    if (node.content) {
+      node.content.forEach(traverse)
+    }
+  }
+
+  traverse(json)
+
+  // 替换全量文档 + 恢复光标
+  editor.commands.setContent(json, false)
+  try {
+    editor.commands.setTextSelection({ from: Math.min(from, editor.state.doc.content.size), to: Math.min(to, editor.state.doc.content.size) })
+  } catch { /* 光标可能越界，忽略 */ }
 }
 
 async function loadMd(editor: any, md: string, retries = 3): Promise<boolean> {
@@ -115,6 +135,7 @@ export function TipTapEditor() {
     },
   })
 
+  // 暴露编辑器
   useEffect(() => {
     if (editor) (window as any).__tiptapEditor = editor
     return () => { delete (window as any).__tiptapEditor }
@@ -127,16 +148,16 @@ export function TipTapEditor() {
     loadMd(editor, markdown).then(ok => {
       if (!cancelled && ok) {
         console.log('[TipTap] loaded')
-        setTimeout(() => applyThemeToDocument(editor), 50)
+        setTimeout(() => syncGlobalState(editor), 50)
       }
     })
     return () => { cancelled = true }
   }, [markdown, editor])
 
-  // 主题/排版变化 → 同步
+  // 主题/排版变化 → JSON 重构
   useEffect(() => {
     if (!editor) return
-    applyThemeToDocument(editor)
+    syncGlobalState(editor)
   }, [h2Style, h3Style, typography.brandColor, typography.fontSize, typography.lineHeight, typography.paragraphSpacing, editor])
 
   const bc = typography.brandColor

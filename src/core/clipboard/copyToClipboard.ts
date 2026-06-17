@@ -22,8 +22,8 @@ export async function copyToClipboard(): Promise<void> {
   const doc = new DOMParser().parseFromString(html, 'text/html')
   expandAllShorthand(doc.body)
 
-  // 外层包裹：防止全局样式丢失（微信兜底）
-  const finalHtml = `<section style="font-family: ${t.fontFamily}; font-size: ${t.fontSize}px; line-height: ${t.lineHeight}; color: #333333; letter-spacing: 0.05em; word-wrap: break-word;">${doc.body.innerHTML}</section>`
+  // 外层包裹：强制写入当前排版状态（微信兜底）
+  const finalHtml = `<section style="font-size: ${t.fontSize}px; line-height: ${t.lineHeight}; color: #333333; font-family: ${t.fontFamily}; text-align: ${t.textAlign}; letter-spacing: 0.05em; word-wrap: break-word;">${doc.body.innerHTML}</section>`
 
   // Clipboard API 写入
   const blob = new Blob([finalHtml], { type: 'text/html; charset=utf-8' })

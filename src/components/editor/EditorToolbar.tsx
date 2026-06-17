@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import type { Editor } from '@tiptap/react'
 import { useEditorStore } from '../../store/useEditorStore'
+import { deriveThemeConfig } from '../../core/themes/themeConfigs'
 
 interface Props { editor: Editor | null }
 
@@ -131,12 +132,8 @@ export function EditorToolbar({ editor }: Props) {
       </button>
       <button onClick={() => {
         const { brandColor } = useEditorStore.getState().typography
-        const hex = brandColor.replace('#', '')
-        const r = Math.round(parseInt(hex.slice(0, 2), 16) * 0.88 + 255 * 0.12)
-        const g = Math.round(parseInt(hex.slice(2, 4), 16) * 0.88 + 255 * 0.12)
-        const b = Math.round(parseInt(hex.slice(4, 6), 16) * 0.88 + 255 * 0.12)
-        const bg = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
-        editor.chain().focus().toggleHighlight({ highlightColor: bg }).run()
+        const theme = deriveThemeConfig(brandColor)
+        editor.chain().focus().toggleHighlight({ color: theme.highlightBg, textColor: theme.highlightText }).run()
       }} className={btn(editor.isActive('weChatHighlight'))}>
         <Highlighter className="w-4 h-4" />
       </button>
