@@ -1,4 +1,4 @@
-import { Node, mergeAttributes } from '@tiptap/core'
+import { Node } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 
 /**
@@ -110,7 +110,7 @@ function buildRenderNode(node: any): any {
 
 const autoNumberPlugin = new Plugin({
   key: new PluginKey('autoNumberWechatHeading'),
-  appendTransaction: (transactions, oldState, newState) => {
+  appendTransaction: (transactions, _oldState, newState) => {
     if (!transactions.some((tr: any) => tr.docChanged)) return null
 
     let tr = newState.tr
@@ -181,7 +181,7 @@ export const WeChatHeading = Node.create({
     const idx = String(HTMLAttributes.index || 1).padStart(2, '0')
 
     const pool = level === 2 ? h2Styles(bc, idx) : h3Styles(bc)
-    const template = pool[style as keyof typeof pool]
+    const template = (pool as any)[style]
 
     if (!template) {
       const fontSize = level === 2 ? '17px' : '16px'
@@ -200,6 +200,6 @@ export const WeChatHeading = Node.create({
     return {
       setWeChatHeading: (attrs: { headingLevel: number; themeStyle: string; brandColor?: string }) =>
         ({ commands }: any) => commands.setNode(this.name, attrs),
-    }
+    } as any
   },
 })

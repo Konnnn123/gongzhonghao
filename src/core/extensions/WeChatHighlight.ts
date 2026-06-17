@@ -1,4 +1,4 @@
-import { Mark, mergeAttributes } from '@tiptap/core'
+import { Mark } from '@tiptap/core'
 
 /**
  * WeChatHighlight —— 微信公众号兼容的高亮 Mark
@@ -46,6 +46,6 @@ export const WeChatHighlight = Mark.create({
           }
           return commands.setMark(this.name, attributes)
         },
-    }
+    } as any
   },
 })

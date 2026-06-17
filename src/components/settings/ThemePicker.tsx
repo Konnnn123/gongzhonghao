@@ -2,7 +2,7 @@ import { useEditorStore } from '../../store/useEditorStore'
 import { THEME_PRESETS } from './ThemePresets'
 
 export function ThemePicker() {
-  const { setH2Style, setH3Style, setTypography, typography } = useEditorStore()
+  const { setH2Style, setH3Style, setTypography } = useEditorStore()
 
   const applyTheme = (idx: number) => {
     const theme = THEME_PRESETS[idx]

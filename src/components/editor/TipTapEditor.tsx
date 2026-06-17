@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -120,7 +120,7 @@ export function TipTapEditor() {
     extensions: [
       StarterKit.configure({
         heading: { levels: [1] },
-        bold: false, underline: false, highlight: false,
+        bold: false, underline: false,
         paragraph: false, bulletList: false, orderedList: false,
         listItem: false, blockquote: false, horizontalRule: false,
       }),

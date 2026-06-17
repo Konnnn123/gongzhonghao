@@ -23,7 +23,6 @@ const COLORS = [
 export function EditorToolbar({ editor }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const colorInputRef = useRef<HTMLInputElement>(null)
-  const hlColorInputRef = useRef<HTMLInputElement>(null)
   const { addImage, typography } = useEditorStore()
   const [showFontSize, setShowFontSize] = useState(false)
   const [showColors, setShowColors] = useState(false)
@@ -104,13 +103,13 @@ export function EditorToolbar({ editor }: Props) {
       </button>
       <button onClick={() => {
         const { h2Style, typography } = useEditorStore.getState()
-        editor.chain().focus().setWeChatHeading({ headingLevel: 2, themeStyle: h2Style, brandColor: typography.brandColor }).run()
+        ;(editor.chain().focus() as any).setWeChatHeading({ headingLevel: 2, themeStyle: h2Style, brandColor: typography.brandColor }).run()
       }} className={btn(editor.isActive('wechatHeading', { headingLevel: 2 }))}>
         <Heading2 className="w-4 h-4" />
       </button>
       <button onClick={() => {
         const { h3Style, typography } = useEditorStore.getState()
-        editor.chain().focus().setWeChatHeading({ headingLevel: 3, themeStyle: h3Style, brandColor: typography.brandColor }).run()
+        ;(editor.chain().focus() as any).setWeChatHeading({ headingLevel: 3, themeStyle: h3Style, brandColor: typography.brandColor }).run()
       }} className={btn(editor.isActive('wechatHeading', { headingLevel: 3 }))}>
         <Heading3 className="w-4 h-4" />
       </button>
@@ -121,7 +120,7 @@ export function EditorToolbar({ editor }: Props) {
       <button onClick={() => {
         const { brandColor } = useEditorStore.getState().typography
         const theme = deriveThemeConfig(brandColor)
-        editor.chain().focus().toggleBold({ color: theme.headingColor }).run()
+        ;(editor.chain().focus() as any).toggleBold({ color: theme.headingColor }).run()
       }} className={btn(editor.isActive('wechatBold'))}>
         <Bold className="w-4 h-4" />
       </button>
@@ -137,7 +136,7 @@ export function EditorToolbar({ editor }: Props) {
       <button onClick={() => {
         const { brandColor } = useEditorStore.getState().typography
         const theme = deriveThemeConfig(brandColor)
-        editor.chain().focus().toggleHighlight({ color: theme.highlightBg, textColor: theme.highlightText }).run()
+        ;(editor.chain().focus() as any).toggleHighlight({ color: theme.highlightBg, textColor: theme.highlightText }).run()
       }} className={btn(editor.isActive('weChatHighlight'))}>
         <Highlighter className="w-4 h-4" />
       </button>
