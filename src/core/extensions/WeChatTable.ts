@@ -2,57 +2,45 @@ import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
-import { mergeAttributes } from '@tiptap/core'
-import { TABLE_THEMES } from '../themes/themeConfigs'
 
 /**
- * 微信公众号表格扩展 —— 安全继承法
+ * 微信公众号表格扩展 —— 属性注入法
  *
- * 核心原则：
- * 1. addAttributes 用 this.parent?.() 保留原生 colspan/rowspan 等属性
- * 2. renderHTML 用 mergeAttributes 合并结构和样式
- * 3. 不覆盖 parseHTML（让 TipTap 原生解析接管）
+ * 铁律：绝不修改原生 HTML 标签结构（不包裹 <div>）
+ * 只通过 addAttributes 的 renderHTML 注入 style 属性
  */
 
-const defaultTheme = TABLE_THEMES.knowledge
+const DEFAULT_TABLE_STYLE = 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px auto; table-layout: fixed; word-wrap: break-word;'
+const DEFAULT_TH_STYLE = 'border: 1px solid #E4E7ED; padding: 12px 8px; background-color: #F5F7FA; color: #2B4A6F; font-weight: bold; text-align: left;'
+const DEFAULT_TD_STYLE = 'border: 1px solid #E4E7ED; padding: 12px 8px; color: #555555;'
 
 export const WeChatTable = Table.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      inlineStyle: { default: defaultTheme.table },
+      inlineStyle: {
+        default: DEFAULT_TABLE_STYLE,
+        parseHTML: (el: HTMLElement) => el.getAttribute('style'),
+        renderHTML: (attrs: Record<string, any>) =>
+          attrs.inlineStyle ? { style: attrs.inlineStyle } : {},
+      },
     }
   },
-
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
-    return [
-      'div',
-      { style: 'overflow-x: auto; margin: 20px 0; width: 100%;' },
-      ['table', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        style: HTMLAttributes.inlineStyle,
-      }), ['tbody', 0]],
-    ]
-  },
 })
 
-export const WeChatTableRow = TableRow.extend({
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
-    return ['tr', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
-  },
-})
+export const WeChatTableRow = TableRow.extend({})
 
 export const WeChatTableHeader = TableHeader.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      inlineStyle: { default: defaultTheme.th },
+      inlineStyle: {
+        default: DEFAULT_TH_STYLE,
+        parseHTML: (el: HTMLElement) => el.getAttribute('style'),
+        renderHTML: (attrs: Record<string, any>) =>
+          attrs.inlineStyle ? { style: attrs.inlineStyle } : {},
+      },
     }
-  },
-
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
-    return ['th', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-      style: HTMLAttributes.inlineStyle,
-    }), 0]
   },
 })
 
@@ -60,13 +48,12 @@ export const WeChatTableCell = TableCell.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      inlineStyle: { default: defaultTheme.td },
+      inlineStyle: {
+        default: DEFAULT_TD_STYLE,
+        parseHTML: (el: HTMLElement) => el.getAttribute('style'),
+        renderHTML: (attrs: Record<string, any>) =>
+          attrs.inlineStyle ? { style: attrs.inlineStyle } : {},
+      },
     }
-  },
-
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
-    return ['td', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-      style: HTMLAttributes.inlineStyle,
-    }), 0]
   },
 })

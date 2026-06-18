@@ -20,18 +20,18 @@ export interface TableThemeConfig {
 export const TABLE_THEMES: Record<string, TableThemeConfig> = {
   knowledge: {
     table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px auto; table-layout: fixed; word-wrap: break-word;',
-    th: 'border-width: 1px; border-style: solid; border-color: #E4E7ED; padding: 12px 8px; background-color: #F5F7FA; color: #2B4A6F; font-weight: bold; text-align: left;',
-    td: 'border-width: 1px; border-style: solid; border-color: #E4E7ED; padding: 12px 8px; color: #555555;',
+    th: 'border: 1px solid #E4E7ED; padding: 12px 8px; background-color: #F5F7FA; color: #2B4A6F; font-weight: bold; text-align: left;',
+    td: 'border: 1px solid #E4E7ED; padding: 12px 8px; color: #555555;',
   },
   humanity: {
-    table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px auto; table-layout: fixed; word-wrap: break-word; border-top-width: 2px; border-top-style: solid; border-top-color: #7D8D7B; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: #7D8D7B;',
-    th: 'padding: 12px 8px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #7D8D7B; color: #7D8D7B; font-weight: bold; text-align: left;',
-    td: 'padding: 12px 8px; border-bottom-width: 1px; border-bottom-style: dashed; border-bottom-color: #EAEAEA; color: #555555;',
+    table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px auto; table-layout: fixed; word-wrap: break-word; border-top: 2px solid #7D8D7B; border-bottom: 2px solid #7D8D7B;',
+    th: 'padding: 12px 8px; border-bottom: 1px solid #7D8D7B; color: #7D8D7B; font-weight: bold; text-align: left;',
+    td: 'padding: 12px 8px; border-bottom: 1px dashed #EAEAEA; color: #555555;',
   },
   minimalist: {
-    table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px auto; table-layout: fixed; word-wrap: break-word; border-width: 1px; border-style: solid; border-color: #F0F0F0;',
+    table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px auto; table-layout: fixed; word-wrap: break-word; border: 1px solid #F0F0F0;',
     th: 'padding: 12px 8px; background-color: #B06A54; color: #FFFFFF; font-weight: bold; text-align: left; border: none;',
-    td: 'padding: 12px 8px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #F0F0F0; color: #333333;',
+    td: 'padding: 12px 8px; border-bottom: 1px solid #F0F0F0; color: #333333;',
   },
 }
 

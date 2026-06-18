@@ -207,6 +207,8 @@ export function TipTapEditor() {
         .tiptap-editor code{background-color:#f2f3f5;padding:2px 6px;border-radius:3px;font-size:13px;color:#c41d7f;}
         .tiptap-editor pre{background-color:#f7f8fa;border-width:1px;border-style:solid;border-color:#e5e6eb;border-radius:6px;padding:16px;margin-top:16px;margin-bottom:16px;overflow-x:auto;font-size:13px;line-height:1.6;}
         .tiptap-editor pre code{background-color:transparent;padding:0;color:#1d2129;}
+        .tiptap-editor table{display:table;width:100%;margin:20px auto !important;border-collapse:collapse;table-layout:fixed;word-wrap:break-word;}
+        .tiptap-editor td p,.tiptap-editor th p{margin:0;}
       `}</style>
     </div>
   )
