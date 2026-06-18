@@ -69,13 +69,13 @@ function syncGlobalState(editor: any) {
     // 表格 → 主题样式
     const tableCfg = TABLE_THEMES[theme.tableTheme] || TABLE_THEMES.knowledge
     if (node.type === 'table') {
-      node.attrs = { ...node.attrs, inlineStyle: tableCfg.table }
+      node.attrs = { ...node.attrs, style: tableCfg.table }
     }
     if (node.type === 'tableHeader') {
-      node.attrs = { ...node.attrs, inlineStyle: tableCfg.th }
+      node.attrs = { ...node.attrs, style: tableCfg.th }
     }
     if (node.type === 'tableCell') {
-      node.attrs = { ...node.attrs, inlineStyle: tableCfg.td }
+      node.attrs = { ...node.attrs, style: tableCfg.td }
     }
 
     // 标记 → 高亮 + 加粗颜色
@@ -207,7 +207,8 @@ export function TipTapEditor() {
         .tiptap-editor code{background-color:#f2f3f5;padding:2px 6px;border-radius:3px;font-size:13px;color:#c41d7f;}
         .tiptap-editor pre{background-color:#f7f8fa;border-width:1px;border-style:solid;border-color:#e5e6eb;border-radius:6px;padding:16px;margin-top:16px;margin-bottom:16px;overflow-x:auto;font-size:13px;line-height:1.6;}
         .tiptap-editor pre code{background-color:transparent;padding:0;color:#1d2129;}
-        .tiptap-editor table{display:table;width:100%;margin:20px auto !important;border-collapse:collapse;table-layout:fixed;word-wrap:break-word;}
+        .tiptap-editor table{display:table !important;width:100%;max-width:100%;margin:20px auto !important;border-collapse:collapse;table-layout:fixed;}
+        .tiptap-editor td,.tiptap-editor th{min-width:1em;position:relative;}
         .tiptap-editor td p,.tiptap-editor th p{margin:0;}
       `}</style>
     </div>
