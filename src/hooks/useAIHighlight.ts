@@ -33,9 +33,11 @@ export function useAIHighlight() {
     try {
       // HTML → Markdown（发给 AI）
       const markdown = await htmlToMarkdown(html)
+      console.log('[AI DEBUG] 发给 AI 的 Markdown 前500字:', markdown.substring(0, 500))
 
       // AI 处理
       const result = await callAI(markdown, aiConfig)
+      console.log('[AI DEBUG] AI 返回结果前500字:', result.substring(0, 500))
 
       // 结果写入 store → TipTap useEffect 检测到变化 → 自动更新编辑器
       setMarkdown(result)

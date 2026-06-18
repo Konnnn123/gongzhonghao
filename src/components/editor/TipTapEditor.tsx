@@ -108,8 +108,12 @@ async function loadMd(editor: any, md: string, retries = 3): Promise<boolean> {
     if (editor && !editor.isDestroyed && editor.isEditable) {
       try {
         const rawHtml = markdownToHtml(md)
+        console.log('[DEBUG] Markdown 源码前500字:', md.substring(0, 500))
+        console.log('[DEBUG] 转换后 HTML 前500字:', rawHtml.substring(0, 500))
         const wxHtml = convertHeadingsToWeChat(rawHtml, h2Style, h3Style, typography.brandColor)
+        console.log('[DEBUG] setContent 前 HTML 前500字:', wxHtml.substring(0, 500))
         editor.commands.setContent(wxHtml, false)
+        console.log('[DEBUG] TipTap 渲染后 DOM 前500字:', editor.view.dom.innerHTML.substring(0, 500))
         return true
       } catch (e) { console.error(`[TipTap] load #${i + 1}:`, e) }
     }
