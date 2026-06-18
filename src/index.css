@@ -75,33 +75,48 @@ body {
   background: var(--color-brand-light) !important;
 }
 
-/* ========== 表格样式（纯 CSS 接管，不修改 JS 扩展） ========== */
-.ProseMirror table {
+/* ========== 表格样式（class 驱动主题切换） ========== */
+.neuro-table {
   width: 100% !important;
-  margin: 20px auto !important;
   border-collapse: collapse !important;
+  margin: 20px auto !important;
   table-layout: fixed !important;
   word-wrap: break-word !important;
 }
-
-.ProseMirror table td,
-.ProseMirror table th {
+.neuro-table td,
+.neuro-table th {
   border: 1px solid #dcdfe6 !important;
   padding: 12px 10px !important;
   vertical-align: middle !important;
 }
+.neuro-table td p,
+.neuro-table th p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
 
-.ProseMirror table th {
+/* 知识专栏风：深蓝表头 */
+.table-theme-knowledge th {
   background-color: #2b4a6f !important;
   color: #ffffff !important;
   font-weight: bold !important;
   text-align: left !important;
 }
 
-.ProseMirror table td p,
-.ProseMirror table th p {
-  margin: 0 !important;
-  padding: 0 !important;
+/* 人文关怀风：茶绿表头 */
+.table-theme-humanity th {
+  background-color: #7d8d7b !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+  text-align: left !important;
+}
+
+/* 极简架构风：赭石表头 */
+.table-theme-minimalist th {
+  background-color: #b06a54 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+  text-align: left !important;
 }
 
 .ProseMirror .selectedCell {

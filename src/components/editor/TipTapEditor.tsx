@@ -12,10 +12,7 @@ import { WeChatHeading } from '../../core/extensions/WeChatHeading'
 import { WeChatHighlight } from '../../core/extensions/WeChatHighlight'
 import { WeChatBold } from '../../core/extensions/WeChatBold'
 import { WeChatReference } from '../../core/extensions/WeChatReference'
-import { Table } from '@tiptap/extension-table'
-import { TableRow } from '@tiptap/extension-table-row'
-import { TableHeader } from '@tiptap/extension-table-header'
-import { TableCell } from '@tiptap/extension-table-cell'
+import { CustomTable, CustomTableRow, CustomTableHeader, CustomTableCell } from '../../core/extensions/WeChatTable'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
   WeChatParagraph, WeChatBulletList, WeChatOrderedList,
@@ -65,6 +62,14 @@ function syncGlobalState(editor: any) {
         ...node.attrs,
         brandColor: theme.headingColor,
         themeStyle: level === 2 ? h2Style : h3Style,
+      }
+    }
+
+    // 表格 → 主题 class
+    if (node.type === 'table') {
+      const newTheme = theme.tableTheme || 'knowledge'
+      if (node.attrs?.theme !== newTheme) {
+        node.attrs = { ...node.attrs, theme: newTheme }
       }
     }
 
@@ -135,11 +140,11 @@ export function TipTapEditor() {
       WeChatHeading,
       WeChatBold,
       WeChatReference,
-      // 原生表格（100% 不修改，通过 CSS 接管样式）
-      Table.configure({ resizable: true }),
-      TableRow,
-      TableHeader,
-      TableCell,
+      // 表格：theme 属性 + class 切换，renderHTML 用 0 占位
+      CustomTable.configure({ resizable: true }),
+      CustomTableRow,
+      CustomTableHeader,
+      CustomTableCell,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
@@ -215,10 +220,6 @@ export function TipTapEditor() {
         .tiptap-editor code{background-color:#f2f3f5;padding:2px 6px;border-radius:3px;font-size:13px;color:#c41d7f;}
         .tiptap-editor pre{background-color:#f7f8fa;border-width:1px;border-style:solid;border-color:#e5e6eb;border-radius:6px;padding:16px;margin-top:16px;margin-bottom:16px;overflow-x:auto;font-size:13px;line-height:1.6;}
         .tiptap-editor pre code{background-color:transparent;padding:0;color:#1d2129;}
-        .tiptap-editor table{width:100%;border-collapse:collapse;margin:20px auto;table-layout:fixed;word-wrap:break-word;}
-        .tiptap-editor th{border:1px solid #E4E7ED;padding:10px 8px;background-color:#2B4A6F;color:white;font-weight:bold;text-align:left;}
-        .tiptap-editor td{border:1px solid #E4E7ED;padding:10px 8px;}
-        .tiptap-editor td p,.tiptap-editor th p{margin:0 !important;}
         .tiptap-editor table{display:table !important;width:100%;max-width:100%;margin:20px auto !important;border-collapse:collapse;table-layout:fixed;}
         .tiptap-editor td,.tiptap-editor th{min-width:1em;position:relative;}
         .tiptap-editor td p,.tiptap-editor th p{margin:0;}
