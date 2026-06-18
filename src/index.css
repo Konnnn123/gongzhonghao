@@ -95,6 +95,13 @@ body {
   font-weight: bold !important;
   text-align: left !important;
 }
+/* 表格主题切换（通过 data-table-theme 属性） */
+.tiptap-editor[data-table-theme="humanity"] .ProseMirror table th {
+  background-color: #7d8d7b !important;
+}
+.tiptap-editor[data-table-theme="minimalist"] .ProseMirror table th {
+  background-color: #b06a54 !important;
+}
 .ProseMirror table td p,
 .ProseMirror table th p {
   margin: 0 !important;

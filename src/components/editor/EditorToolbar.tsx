@@ -4,7 +4,7 @@ import {
   Heading1, Heading2, Heading3,
   List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
   Quote, Minus, ImagePlus, Undo2, Redo2, Highlighter,
-  Palette, Type, Table, Stamp,
+  Palette, Type, Table, Stamp, Paintbrush,
 } from 'lucide-react'
 import type { Editor } from '@tiptap/react'
 import { useEditorStore } from '../../store/useEditorStore'
@@ -29,14 +29,17 @@ export function EditorToolbar({ editor }: Props) {
   const { addImage, typography } = useEditorStore()
   const [showFontSize, setShowFontSize] = useState(false)
   const [showColors, setShowColors] = useState(false)
+  const [showTableStyle, setShowTableStyle] = useState(false)
   const fontSizeRef = useRef<HTMLDivElement>(null)
   const colorRef = useRef<HTMLDivElement>(null)
+  const tableStyleRef = useRef<HTMLDivElement>(null)
 
   // 点击外部关闭下拉
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (fontSizeRef.current && !fontSizeRef.current.contains(e.target as Node)) setShowFontSize(false)
       if (colorRef.current && !colorRef.current.contains(e.target as Node)) setShowColors(false)
+      if (tableStyleRef.current && !tableStyleRef.current.contains(e.target as Node)) setShowTableStyle(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -247,15 +250,39 @@ export function EditorToolbar({ editor }: Props) {
       <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} className={btn(false)} title="插入表格">
         <Table className="w-4 h-4" />
       </button>
-      {/* 表格操作 */}
-      {editor.isActive('table') && (
-        <>
-          <button onClick={() => editor.chain().focus().addColumnAfter().run()} className={btn(false)} title="右加列">+列</button>
-          <button onClick={() => editor.chain().focus().addRowAfter().run()} className={btn(false)} title="下加行">+行</button>
-          <button onClick={() => editor.chain().focus().deleteColumn().run()} className={btn(false)} title="删列">-列</button>
-          <button onClick={() => editor.chain().focus().deleteRow().run()} className={btn(false)} title="删行">-行</button>
-        </>
-      )}
+      {/* 表格操作 — 始终显示，命令内部会自行判断 */}
+      <button onClick={() => editor.chain().focus().addColumnAfter().run()} className={btn(false)} title="右加列">+列</button>
+      <button onClick={() => editor.chain().focus().addRowAfter().run()} className={btn(false)} title="下加行">+行</button>
+      <button onClick={() => editor.chain().focus().deleteColumn().run()} className={btn(false)} title="删列">-列</button>
+      <button onClick={() => editor.chain().focus().deleteRow().run()} className={btn(false)} title="删行">-行</button>
+      {/* 表格风格切换 */}
+      <div className="relative" ref={tableStyleRef}>
+        <button onClick={() => setShowTableStyle(!showTableStyle)} className="flex items-center gap-0.5 px-1.5 py-1 rounded text-xs text-text-secondary hover:bg-surface-secondary transition-colors" title="表格风格">
+          <Paintbrush className="w-3.5 h-3.5" />
+          <span className="text-[10px]">表风</span>
+        </button>
+        {showTableStyle && (
+          <div className="absolute top-full left-0 mt-1 bg-surface border border-border rounded-lg shadow-lg z-50 py-1 w-36">
+            {[
+              { key: 'knowledge', label: '经典网格', color: '#2B4A6F' },
+              { key: 'humanity', label: '学术三线', color: '#7D8D7B' },
+              { key: 'minimalist', label: '极简色块', color: '#B06A54' },
+            ].map((t) => (
+              <button key={t.key} onClick={() => {
+                // 通过 CSS 变量切换表头颜色
+                const editorEl = document.querySelector('.tiptap-editor')
+                if (editorEl) {
+                  editorEl.setAttribute('data-table-theme', t.key)
+                }
+                setShowTableStyle(false)
+              }} className="w-full flex items-center gap-2 px-3 py-1.5 text-xs hover:bg-surface-secondary text-left">
+                <span className="w-3 h-3 rounded-sm" style={{ background: t.color }} />
+                {t.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="w-px h-5 bg-border mx-1" />
 
