@@ -1,7 +1,6 @@
 /**
  * 轻量 Markdown → HTML 转换器
- * 生成 TipTap 兼容的干净 HTML
- * 根据当前 H2/H3 样式设置，为标题添加 data 属性
+ * 支持：标题、段落、列表、代码块、表格、引用、分隔线、图片、链接
  */
 export function markdownToHtml(markdown: string, h2Style?: string, h3Style?: string): string {
   const lines = markdown.split('\n')
@@ -10,28 +9,100 @@ export function markdownToHtml(markdown: string, h2Style?: string, h3Style?: str
   let codeContent = ''
   let inList = false
   let listType: 'ul' | 'ol' = 'ul'
+  let inTable = false
+  let tableRows: string[][] = []
+
+  function flushTable() {
+    if (!inTable || tableRows.length === 0) return
+    // 检测分隔行（| --- | --- |）
+    let headerIdx = -1
+    for (let i = 0; i < tableRows.length; i++) {
+      if (tableRows[i].every(cell => /^\s*[-:]+\s*$/.test(cell))) {
+        headerIdx = i
+        break
+      }
+    }
+    const hasHeader = headerIdx >= 0
+    const dataRows = hasHeader
+      ? tableRows.filter((_, i) => i !== headerIdx)
+      : tableRows
+
+    htmlParts.push('<table>')
+    if (hasHeader && dataRows.length > 0) {
+      htmlParts.push('<thead>')
+      htmlParts.push('<tr>')
+      for (const cell of tableRows[headerIdx]) {
+        htmlParts.push(`<th>${processInline(cell.trim())}</th>`)
+      }
+      htmlParts.push('</tr>')
+      htmlParts.push('</thead>')
+      htmlParts.push('<tbody>')
+      for (const row of dataRows) {
+        htmlParts.push('<tr>')
+        for (const cell of row) {
+          htmlParts.push(`<td>${processInline(cell.trim())}</td>`)
+        }
+        htmlParts.push('</tr>')
+      }
+      htmlParts.push('</tbody>')
+    } else {
+      // 无分隔行，全部当数据行
+      htmlParts.push('<tbody>')
+      for (const row of tableRows) {
+        htmlParts.push('<tr>')
+        for (const cell of row) {
+          htmlParts.push(`<td>${processInline(cell.trim())}</td>`)
+        }
+        htmlParts.push('</tr>')
+      }
+      htmlParts.push('</tbody>')
+    }
+    htmlParts.push('</table>')
+    tableRows = []
+    inTable = false
+  }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
+    const trimmed = line.trim()
 
-    if (line.trimStart().startsWith('```')) {
+    // 代码块
+    if (trimmed.startsWith('```')) {
       if (inCodeBlock) {
         htmlParts.push(`<pre><code>${escapeHtml(codeContent.trimEnd())}</code></pre>`)
         codeContent = ''
         inCodeBlock = false
       } else {
+        flushTable()
+        if (inList) { htmlParts.push(listType === 'ul' ? '</ul>' : '</ol>'); inList = false }
         inCodeBlock = true
       }
       continue
     }
     if (inCodeBlock) { codeContent += line + '\n'; continue }
 
-    const trimmed = line.trim()
+    // 表格行
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      if (!inTable) {
+        flushTable()
+        if (inList) { htmlParts.push(listType === 'ul' ? '</ul>' : '</ol>'); inList = false }
+        inTable = true
+      }
+      // 解析 | cell1 | cell2 | → ['cell1', 'cell2']
+      const cells = trimmed.split('|').slice(1, -1) // 去掉首尾空元素
+      tableRows.push(cells)
+      continue
+    } else if (inTable) {
+      flushTable()
+    }
+
+    // 空行
     if (!trimmed) {
       if (inList) { htmlParts.push(listType === 'ul' ? '</ul>' : '</ol>'); inList = false }
       continue
     }
 
+    // 标题
     const headingMatch = trimmed.match(/^(#{1,3})\s+(.+)$/)
     if (headingMatch) {
       const level = headingMatch[1].length
@@ -41,13 +112,16 @@ export function markdownToHtml(markdown: string, h2Style?: string, h3Style?: str
       continue
     }
 
+    // 分隔线
     if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) { htmlParts.push('<hr>'); continue }
 
+    // 无序列表
     if (/^[-*+]\s+/.test(trimmed)) {
       if (!inList || listType !== 'ul') { if (inList) htmlParts.push(listType === 'ul' ? '</ul>' : '</ol>'); htmlParts.push('<ul>'); inList = true; listType = 'ul' }
       htmlParts.push(`<li>${processInline(trimmed.replace(/^[-*+]\s+/, ''))}</li>`)
       continue
     }
+    // 有序列表
     if (/^\d+[.)]\s+/.test(trimmed)) {
       if (!inList || listType !== 'ol') { if (inList) htmlParts.push(listType === 'ul' ? '</ul>' : '</ol>'); htmlParts.push('<ol>'); inList = true; listType = 'ol' }
       htmlParts.push(`<li>${processInline(trimmed.replace(/^\d+[.)]\s+/, ''))}</li>`)
@@ -56,14 +130,25 @@ export function markdownToHtml(markdown: string, h2Style?: string, h3Style?: str
 
     if (inList) { htmlParts.push(listType === 'ul' ? '</ul>' : '</ol>'); inList = false }
 
-    if (trimmed.startsWith('>')) { htmlParts.push(`<blockquote><p>${processInline(trimmed.replace(/^>\s*/, ''))}</p></blockquote>`); continue }
-    if (/^!\[([^\]]*)\]\(([^)]+)\)$/.test(trimmed)) { const m = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)!; htmlParts.push(`<img src="${m[2]}" alt="${escapeHtml(m[1])}">`); continue }
+    // 引用
+    if (trimmed.startsWith('>')) {
+      htmlParts.push(`<blockquote><p>${processInline(trimmed.replace(/^>\s*/, ''))}</p></blockquote>`)
+      continue
+    }
+    // 图片
+    if (/^!\[([^\]]*)\]\(([^)]+)\)$/.test(trimmed)) {
+      const m = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)!
+      htmlParts.push(`<img src="${m[2]}" alt="${escapeHtml(m[1])}">`)
+      continue
+    }
 
+    // 普通段落
     htmlParts.push(`<p>${processInline(trimmed)}</p>`)
   }
 
   if (inList) htmlParts.push(listType === 'ul' ? '</ul>' : '</ol>')
   if (inCodeBlock) htmlParts.push(`<pre><code>${escapeHtml(codeContent)}</code></pre>`)
+  flushTable()
   return htmlParts.join('\n')
 }
 
@@ -80,7 +165,9 @@ function processInline(text: string): string {
   return r
 }
 
-function escapeHtml(t: string): string { return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') }
+function escapeHtml(t: string): string {
+  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
 
 export function htmlToMarkdown(html: string): string {
   let md = html
