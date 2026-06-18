@@ -3,8 +3,7 @@ import { Node, mergeAttributes } from '@tiptap/core'
 /**
  * WeChatReference —— 微信公众号参考文献区块
  *
- * 视觉降级：小字号、浅灰色、紧凑行距
- * 用于包裹文章底部的参考文献/引用列表
+ * 极致紧凑：13px 浅灰 + margin 压到最小 + font-weight: normal
  */
 
 export const WeChatReference = Node.create({
@@ -15,7 +14,6 @@ export const WeChatReference = Node.create({
   parseHTML() {
     return [
       { tag: 'section[data-type="reference"]' },
-      { tag: 'small' },
     ]
   },
 
@@ -24,7 +22,7 @@ export const WeChatReference = Node.create({
       'section',
       mergeAttributes(HTMLAttributes, {
         'data-type': 'reference',
-        style: 'font-size: 13px; color: #888888; line-height: 1.6; margin-top: 16px; margin-bottom: 8px; word-break: break-all; overflow-wrap: break-word; padding-top: 12px; border-top-width: 1px; border-top-style: solid; border-top-color: #e5e6eb;',
+        style: 'font-size: 13px; color: #888888; line-height: 1.5; margin: 0 0 6px 0; padding: 0; word-break: break-all; overflow-wrap: break-word; font-weight: normal;',
       }),
       0,
     ]
