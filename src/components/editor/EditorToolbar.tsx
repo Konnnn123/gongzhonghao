@@ -287,18 +287,31 @@ export function EditorToolbar({ editor }: Props) {
       <div className="w-px h-5 bg-border mx-1" />
 
       {/* 自动植入品牌名片 */}
-      <button onClick={() => {
-        // 1. focus('start') 安全地在最顶部插入头图
+      <button onClick={async () => {
+        // 将 Vite URL 转为 Base64 data URL（微信只认 Base64）
+        const toBase64 = async (url: string) => {
+          const resp = await fetch(url)
+          const blob = await resp.blob()
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result as string)
+            reader.readAsDataURL(blob)
+          })
+        }
+        const [hImg, sImg, fImg] = await Promise.all([
+          toBase64(headingImg), toBase64(separateImg), toBase64(finalImg),
+        ])
+        // 1. 顶部插入头图
         editor.chain().focus('start').insertContent({
-          type: 'image', attrs: { src: headingImg },
+          type: 'image', attrs: { src: hImg },
         }).run()
-        // 2. focus('end') 追加底部所有内容
+        // 2. 底部插入分割线 + 文案 + 名片
         editor.chain().focus('end').insertContent([
-          { type: 'image', attrs: { src: separateImg } },
+          { type: 'image', attrs: { src: sImg } },
           { type: 'paragraph', content: [{ type: 'text', text: '我们的公众号：' }] },
           { type: 'paragraph', content: [{ type: 'text', text: '我们的小红书：脑脑空间NeuroBridge (下图扫码)' }] },
           { type: 'paragraph', content: [{ type: 'text', text: '点击"阅读原文"跳转脑脑客厅网站。' }] },
-          { type: 'image', attrs: { src: finalImg } },
+          { type: 'image', attrs: { src: fImg } },
           { type: 'paragraph', content: [{ type: 'text', text: '文章：Admin' }] },
           { type: 'paragraph', content: [{ type: 'text', text: '图片：Gemini' }] },
           { type: 'paragraph', content: [{ type: 'text', text: '排版：自动排版AI' }] },
