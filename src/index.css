@@ -74,3 +74,36 @@ body {
   border-color: var(--color-brand) !important;
   background: var(--color-brand-light) !important;
 }
+
+/* ========== 表格样式（纯 CSS 接管，不修改 JS 扩展） ========== */
+.ProseMirror table {
+  width: 100% !important;
+  margin: 20px auto !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+  word-wrap: break-word !important;
+}
+
+.ProseMirror table td,
+.ProseMirror table th {
+  border: 1px solid #dcdfe6 !important;
+  padding: 12px 10px !important;
+  vertical-align: middle !important;
+}
+
+.ProseMirror table th {
+  background-color: #2b4a6f !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+  text-align: left !important;
+}
+
+.ProseMirror table td p,
+.ProseMirror table th p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.ProseMirror .selectedCell {
+  background-color: rgba(30, 128, 255, 0.1) !important;
+}

@@ -16,8 +16,6 @@ import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableHeader } from '@tiptap/extension-table-header'
 import { TableCell } from '@tiptap/extension-table-cell'
-import { TableStyleExtension } from '../../core/extensions/TableStyleExtension'
-import { TABLE_THEMES } from '../../core/themes/themeConfigs'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
   WeChatParagraph, WeChatBulletList, WeChatOrderedList,
@@ -68,18 +66,6 @@ function syncGlobalState(editor: any) {
         brandColor: theme.headingColor,
         themeStyle: level === 2 ? h2Style : h3Style,
       }
-    }
-
-    // 表格 → 主题样式（通过 TableStyleExtension 的 inlineStyle 属性）
-    const tableCfg = TABLE_THEMES[theme.tableTheme] || TABLE_THEMES.knowledge
-    if (node.type === 'table') {
-      node.attrs = { ...node.attrs, inlineStyle: tableCfg.table }
-    }
-    if (node.type === 'tableHeader') {
-      node.attrs = { ...node.attrs, inlineStyle: tableCfg.th }
-    }
-    if (node.type === 'tableCell') {
-      node.attrs = { ...node.attrs, inlineStyle: tableCfg.td }
     }
 
     // 标记 → 高亮 + 加粗颜色
@@ -149,12 +135,11 @@ export function TipTapEditor() {
       WeChatHeading,
       WeChatBold,
       WeChatReference,
-      // 原生表格（100% 兼容 Word/粘贴/Markdown）
-      Table.configure({ resizable: false }),
+      // 原生表格（100% 不修改，通过 CSS 接管样式）
+      Table.configure({ resizable: true }),
       TableRow,
       TableHeader,
       TableCell,
-      TableStyleExtension,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
@@ -165,6 +150,10 @@ export function TipTapEditor() {
       attributes: {
         class: 'tiptap-editor outline-none min-h-full p-6',
         style: `font-size:${typography.fontSize}px;line-height:${typography.lineHeight};color:#333;font-family:${typography.fontFamily};`,
+      },
+      // 粘贴过滤：清除 Word 的 mso- 冗余样式
+      transformPastedHTML: (html: string) => {
+        return html.replace(/mso-[^:]+:[^;]+;?/gi, '')
       },
     },
   })
