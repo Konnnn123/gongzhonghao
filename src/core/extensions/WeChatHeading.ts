@@ -119,7 +119,7 @@ const autoNumberPlugin = new Plugin({
 
     newState.doc.descendants((node: any, pos: number) => {
       // 【免疫隔离】：表格内的节点绝对不碰
-      if (node.type.name === 'table' || node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
+      if (node.type.name === 'table' || node.type.name === 'tableRow' || node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
         return false // 返回 false 阻止递归进入表格内部
       }
 

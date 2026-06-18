@@ -155,10 +155,16 @@ export function TipTapEditor() {
       transformPastedHTML: (html: string) => {
         return html.replace(/mso-[^:]+:[^;]+;?/gi, '')
       },
-      // 表格粘贴隔离：让原生 TipTap 处理，不走自定义插件
-      handlePaste: (_view: any, _event: any, slice: any) => {
+      // 表格粘贴隔离：检测 HTML 内容，确保原生 TipTap 处理表格
+      handlePaste: (_view: any, event: any, slice: any) => {
+        // 检查 slice 中是否已有 table 节点
         if (slice.content.firstChild?.type?.name === 'table') {
-          return false // return false = 交给原生 TipTap 处理
+          return false
+        }
+        // 检查剪贴板 HTML 中是否包含 table
+        const html = event.clipboardData?.getData('text/html') || ''
+        if (html.includes('<table')) {
+          return false // 交给原生 TipTap 处理
         }
         return false
       },
