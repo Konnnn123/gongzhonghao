@@ -96,11 +96,17 @@ body {
   text-align: left !important;
 }
 /* 表格主题切换（通过 data-table-theme 属性） */
-.tiptap-editor[data-table-theme="humanity"] .ProseMirror table th {
+.tiptap-editor[data-table-theme="humanity"] table th {
   background-color: #7d8d7b !important;
 }
-.tiptap-editor[data-table-theme="minimalist"] .ProseMirror table th {
+.tiptap-editor[data-table-theme="minimalist"] table th {
   background-color: #b06a54 !important;
+}
+
+/* 新增列的默认宽度 */
+.ProseMirror table td,
+.ProseMirror table th {
+  min-width: 80px !important;
 }
 .ProseMirror table td p,
 .ProseMirror table th p {
