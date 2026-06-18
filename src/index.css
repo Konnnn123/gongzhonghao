@@ -82,13 +82,14 @@ body {
   margin: 20px auto !important;
   table-layout: fixed !important;
   word-wrap: break-word !important;
-  font-size: var(--table-font-size, 13px) !important;
 }
 .ProseMirror table td,
 .ProseMirror table th {
   border: 1px solid #dcdfe6 !important;
-  padding: 12px 10px !important;
+  padding: 8px !important;
   vertical-align: middle !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
 }
 .ProseMirror table th {
   background-color: #2b4a6f !important;
