@@ -153,7 +153,7 @@ export function TipTapEditor() {
     editorProps: {
       attributes: {
         class: 'tiptap-editor outline-none min-h-full p-6',
-        style: `font-size:${typography.fontSize}px;line-height:${typography.lineHeight};color:#333;font-family:${typography.fontFamily};`,
+        style: `font-size:${typography.fontSize}px;line-height:${typography.lineHeight};color:#333;font-family:${typography.fontFamily};--table-font-size:13px;`,
       },
       // 粘贴过滤：清除 Word 的 mso- 冗余样式
       transformPastedHTML: (html: string) => {
