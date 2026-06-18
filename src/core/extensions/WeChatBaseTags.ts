@@ -23,7 +23,7 @@ export const WeChatParagraph = Paragraph.extend({
 
   renderHTML({ HTMLAttributes }) {
     return ['p', mergeAttributes(HTMLAttributes, {
-      style: `font-size: ${HTMLAttributes.fontSize}; line-height: ${HTMLAttributes.lineHeight}; margin-bottom: ${HTMLAttributes.marginBottom}; text-align: justify; word-wrap: break-word; letter-spacing: 0.05em;`,
+      style: `line-height: ${HTMLAttributes.lineHeight}; margin-bottom: ${HTMLAttributes.marginBottom}; text-align: justify; word-wrap: break-word; letter-spacing: 0.05em;`,
     }), 0]
   },
 })

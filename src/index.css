@@ -114,6 +114,9 @@ body {
 .ProseMirror table th p {
   margin: 0 !important;
   padding: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: inherit !important;
 }
 .ProseMirror .selectedCell {
   background-color: rgba(30, 128, 255, 0.1) !important;
