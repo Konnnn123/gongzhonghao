@@ -252,14 +252,20 @@ export function EditorToolbar({ editor }: Props) {
 
       {/* 自动植入品牌名片 */}
       <button onClick={() => {
-        // 1. 在最顶部插入头图
-        editor.chain().focus().insertContentAt(0, { type: 'image', attrs: { src: headingImg } }).run()
-        // 2. 在最底部插入分割线 + 名片
-        const end = editor.state.doc.content.size
-        editor.chain().focus().insertContentAt(end, [
+        // 1. focus('start') 安全地在最顶部插入头图
+        editor.chain().focus('start').insertContent({
+          type: 'image', attrs: { src: headingImg },
+        }).run()
+        // 2. focus('end') 追加底部所有内容
+        editor.chain().focus('end').insertContent([
           { type: 'image', attrs: { src: separateImg } },
-          { type: 'wechatParagraph', content: [{ type: 'text', text: ' ' }] },
+          { type: 'wechatParagraph', content: [{ type: 'text', text: '我们的公众号：' }] },
+          { type: 'wechatParagraph', content: [{ type: 'text', text: '我们的小红书：脑脑空间NeuroBridge (下图扫码)' }] },
+          { type: 'wechatParagraph', content: [{ type: 'text', text: '点击"阅读原文"跳转脑脑客厅网站。' }] },
           { type: 'image', attrs: { src: finalImg } },
+          { type: 'wechatParagraph', content: [{ type: 'text', text: '文章：Admin' }] },
+          { type: 'wechatParagraph', content: [{ type: 'text', text: '图片：Gemini' }] },
+          { type: 'wechatParagraph', content: [{ type: 'text', text: '排版：自动排版AI' }] },
         ]).run()
       }} className="flex items-center gap-0.5 px-1.5 py-1 rounded text-xs text-text-secondary hover:bg-surface-secondary transition-colors" title="自动植入品牌名片">
         <Stamp className="w-3.5 h-3.5" />
