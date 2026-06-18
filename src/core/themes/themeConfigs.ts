@@ -8,6 +8,31 @@ export interface ThemeConfig {
   highlightText: string
   highlightBg: string
   underlineColor: string
+  tableTheme: string
+}
+
+export interface TableThemeConfig {
+  table: string
+  th: string
+  td: string
+}
+
+export const TABLE_THEMES: Record<string, TableThemeConfig> = {
+  knowledge: {
+    table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 0 auto; word-break: break-all;',
+    th: 'border-width: 1px; border-style: solid; border-color: #E4E7ED; padding: 10px 8px; background-color: #F5F7FA; color: #2B4A6F; font-weight: bold; text-align: left;',
+    td: 'border-width: 1px; border-style: solid; border-color: #E4E7ED; padding: 10px 8px; color: #555555;',
+  },
+  humanity: {
+    table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 0 auto; word-break: break-all; border-top-width: 2px; border-top-style: solid; border-top-color: #7D8D7B; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: #7D8D7B;',
+    th: 'padding: 10px 8px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #7D8D7B; color: #7D8D7B; font-weight: bold; text-align: left;',
+    td: 'padding: 10px 8px; border-bottom-width: 1px; border-bottom-style: dashed; border-bottom-color: #EAEAEA; color: #555555;',
+  },
+  minimalist: {
+    table: 'width: 100%; border-collapse: collapse; font-size: 14px; margin: 0 auto; word-break: break-all; border-width: 1px; border-style: solid; border-color: #F0F0F0;',
+    th: 'padding: 12px 8px; background-color: #B06A54; color: #FFFFFF; font-weight: bold; text-align: left; border: none;',
+    td: 'padding: 10px 8px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #F0F0F0; color: #333333;',
+  },
 }
 
 export const THEME_CONFIGS: Record<string, ThemeConfig> = {
@@ -16,18 +41,21 @@ export const THEME_CONFIGS: Record<string, ThemeConfig> = {
     highlightText: '#1A3250',
     highlightBg: '#EAEFF4',
     underlineColor: '#849CB5',
+    tableTheme: 'knowledge',
   },
   humanity: {
     headingColor: '#7D8D7B',
     highlightText: '#536151',
     highlightBg: '#F1F4F0',
     underlineColor: '#B3BEB1',
+    tableTheme: 'humanity',
   },
   minimalist: {
     headingColor: '#B06A54',
     highlightText: '#8C4E3A',
     highlightBg: '#F7EDEA',
     underlineColor: '#D6BDB6',
+    tableTheme: 'minimalist',
   },
 }
 
@@ -55,10 +83,17 @@ export function deriveThemeConfig(brandColor: string): ThemeConfig {
 
   const toHex = (n: number) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0')
 
+  // 根据品牌色推导表格主题
+  const tableTheme = brandColor === '#2B4A6F' ? 'knowledge'
+    : brandColor === '#7D8D7B' ? 'humanity'
+    : brandColor === '#B06A54' ? 'minimalist'
+    : 'knowledge'
+
   return {
     headingColor: brandColor,
     highlightText: `#${toHex(textR)}${toHex(textG)}${toHex(textB)}`,
     highlightBg: `#${toHex(bgR)}${toHex(bgG)}${toHex(bgB)}`,
     underlineColor: `#${toHex(ulR)}${toHex(ulG)}${toHex(ulB)}`,
+    tableTheme,
   }
 }

@@ -4,7 +4,7 @@ import {
   Heading1, Heading2, Heading3,
   List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
   Quote, Minus, ImagePlus, Undo2, Redo2, Highlighter,
-  Palette, Type,
+  Palette, Type, Table,
 } from 'lucide-react'
 import type { Editor } from '@tiptap/react'
 import { useEditorStore } from '../../store/useEditorStore'
@@ -241,6 +241,9 @@ export function EditorToolbar({ editor }: Props) {
         <ImagePlus className="w-4 h-4" />
       </button>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+      <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} className={btn(false)} title="插入表格">
+        <Table className="w-4 h-4" />
+      </button>
     </div>
   )
 }

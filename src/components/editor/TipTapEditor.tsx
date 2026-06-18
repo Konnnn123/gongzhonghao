@@ -12,6 +12,8 @@ import { WeChatHeading } from '../../core/extensions/WeChatHeading'
 import { WeChatHighlight } from '../../core/extensions/WeChatHighlight'
 import { WeChatBold } from '../../core/extensions/WeChatBold'
 import { WeChatReference } from '../../core/extensions/WeChatReference'
+import { WeChatTable, WeChatTableRow, WeChatTableHeader, WeChatTableCell } from '../../core/extensions/WeChatTable'
+import { TABLE_THEMES } from '../../core/themes/themeConfigs'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
   WeChatParagraph, WeChatBulletList, WeChatOrderedList,
@@ -62,6 +64,18 @@ function syncGlobalState(editor: any) {
         brandColor: theme.headingColor,
         themeStyle: level === 2 ? h2Style : h3Style,
       }
+    }
+
+    // 表格 → 主题样式
+    const tableCfg = TABLE_THEMES[theme.tableTheme] || TABLE_THEMES.knowledge
+    if (node.type === 'table') {
+      node.attrs = { ...node.attrs, inlineStyle: tableCfg.table }
+    }
+    if (node.type === 'tableHeader') {
+      node.attrs = { ...node.attrs, inlineStyle: tableCfg.th }
+    }
+    if (node.type === 'tableCell') {
+      node.attrs = { ...node.attrs, inlineStyle: tableCfg.td }
     }
 
     // 标记 → 高亮 + 加粗颜色
@@ -131,6 +145,10 @@ export function TipTapEditor() {
       WeChatHeading,
       WeChatBold,
       WeChatReference,
+      WeChatTable.configure({ resizable: false }),
+      WeChatTableRow,
+      WeChatTableHeader,
+      WeChatTableCell,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
