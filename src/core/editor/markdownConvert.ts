@@ -23,40 +23,32 @@ export function markdownToHtml(markdown: string, h2Style?: string, h3Style?: str
       }
     }
     const hasHeader = headerIdx >= 0
+    // 表头是分隔行的上一行（分隔行本身不显示）
+    const headerRow = hasHeader ? tableRows[headerIdx - 1] : null
     const dataRows = hasHeader
-      ? tableRows.filter((_, i) => i !== headerIdx)
+      ? tableRows.filter((_, i) => i !== headerIdx && i !== headerIdx - 1)
       : tableRows
 
     htmlParts.push('<table>')
-    if (hasHeader && dataRows.length > 0) {
+    if (headerRow) {
       htmlParts.push('<thead>')
       htmlParts.push('<tr>')
-      for (const cell of tableRows[headerIdx]) {
+      for (const cell of headerRow) {
         htmlParts.push(`<th>${processInline(cell.trim())}</th>`)
       }
       htmlParts.push('</tr>')
       htmlParts.push('</thead>')
-      htmlParts.push('<tbody>')
-      for (const row of dataRows) {
-        htmlParts.push('<tr>')
-        for (const cell of row) {
-          htmlParts.push(`<td>${processInline(cell.trim())}</td>`)
-        }
-        htmlParts.push('</tr>')
-      }
-      htmlParts.push('</tbody>')
-    } else {
-      // 无分隔行，全部当数据行
-      htmlParts.push('<tbody>')
-      for (const row of tableRows) {
-        htmlParts.push('<tr>')
-        for (const cell of row) {
-          htmlParts.push(`<td>${processInline(cell.trim())}</td>`)
-        }
-        htmlParts.push('</tr>')
-      }
-      htmlParts.push('</tbody>')
     }
+    htmlParts.push('<tbody>')
+    const rowsToRender = headerRow ? dataRows : tableRows
+    for (const row of rowsToRender) {
+      htmlParts.push('<tr>')
+      for (const cell of row) {
+        htmlParts.push(`<td>${processInline(cell.trim())}</td>`)
+      }
+      htmlParts.push('</tr>')
+    }
+    htmlParts.push('</tbody>')
     htmlParts.push('</table>')
     tableRows = []
     inTable = false

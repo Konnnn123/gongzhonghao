@@ -247,6 +247,15 @@ export function EditorToolbar({ editor }: Props) {
       <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} className={btn(false)} title="插入表格">
         <Table className="w-4 h-4" />
       </button>
+      {/* 表格操作 */}
+      {editor.isActive('table') && (
+        <>
+          <button onClick={() => editor.chain().focus().addColumnAfter().run()} className={btn(false)} title="右加列">+列</button>
+          <button onClick={() => editor.chain().focus().addRowAfter().run()} className={btn(false)} title="下加行">+行</button>
+          <button onClick={() => editor.chain().focus().deleteColumn().run()} className={btn(false)} title="删列">-列</button>
+          <button onClick={() => editor.chain().focus().deleteRow().run()} className={btn(false)} title="删行">-行</button>
+        </>
+      )}
 
       <div className="w-px h-5 bg-border mx-1" />
 
