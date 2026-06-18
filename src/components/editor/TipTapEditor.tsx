@@ -12,7 +12,10 @@ import { WeChatHeading } from '../../core/extensions/WeChatHeading'
 import { WeChatHighlight } from '../../core/extensions/WeChatHighlight'
 import { WeChatBold } from '../../core/extensions/WeChatBold'
 import { WeChatReference } from '../../core/extensions/WeChatReference'
-import { CustomTable, CustomTableRow, CustomTableHeader, CustomTableCell } from '../../core/extensions/WeChatTable'
+import { Table as NativeTable } from '@tiptap/extension-table'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableHeader } from '@tiptap/extension-table-header'
+import { TableCell } from '@tiptap/extension-table-cell'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
   WeChatParagraph, WeChatBulletList, WeChatOrderedList,
@@ -62,14 +65,6 @@ function syncGlobalState(editor: any) {
         ...node.attrs,
         brandColor: theme.headingColor,
         themeStyle: level === 2 ? h2Style : h3Style,
-      }
-    }
-
-    // 表格 → 主题 class
-    if (node.type === 'table') {
-      const newTheme = theme.tableTheme || 'knowledge'
-      if (node.attrs?.theme !== newTheme) {
-        node.attrs = { ...node.attrs, theme: newTheme }
       }
     }
 
@@ -140,11 +135,11 @@ export function TipTapEditor() {
       WeChatHeading,
       WeChatBold,
       WeChatReference,
-      // 表格：theme 属性 + class 切换，renderHTML 用 0 占位
-      CustomTable.configure({ resizable: true }),
-      CustomTableRow,
-      CustomTableHeader,
-      CustomTableCell,
+      // 原生表格 — 零自定义，CSS 接管样式
+      NativeTable.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
