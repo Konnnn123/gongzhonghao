@@ -4,11 +4,14 @@ import {
   Heading1, Heading2, Heading3,
   List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
   Quote, Minus, ImagePlus, Undo2, Redo2, Highlighter,
-  Palette, Type, Table,
+  Palette, Type, Table, Stamp,
 } from 'lucide-react'
 import type { Editor } from '@tiptap/react'
 import { useEditorStore } from '../../store/useEditorStore'
 import { deriveThemeConfig } from '../../core/themes/themeConfigs'
+import headingImg from '../../../neurobridge/heading.jpg'
+import separateImg from '../../../neurobridge/separate.png'
+import finalImg from '../../../neurobridge/final.png'
 
 interface Props { editor: Editor | null }
 
@@ -243,6 +246,24 @@ export function EditorToolbar({ editor }: Props) {
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
       <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} className={btn(false)} title="插入表格">
         <Table className="w-4 h-4" />
+      </button>
+
+      <div className="w-px h-5 bg-border mx-1" />
+
+      {/* 自动植入品牌名片 */}
+      <button onClick={() => {
+        // 1. 在最顶部插入头图
+        editor.chain().focus().insertContentAt(0, { type: 'image', attrs: { src: headingImg } }).run()
+        // 2. 在最底部插入分割线 + 名片
+        const end = editor.state.doc.content.size
+        editor.chain().focus().insertContentAt(end, [
+          { type: 'image', attrs: { src: separateImg } },
+          { type: 'wechatParagraph', content: [{ type: 'text', text: ' ' }] },
+          { type: 'image', attrs: { src: finalImg } },
+        ]).run()
+      }} className="flex items-center gap-0.5 px-1.5 py-1 rounded text-xs text-text-secondary hover:bg-surface-secondary transition-colors" title="自动植入品牌名片">
+        <Stamp className="w-3.5 h-3.5" />
+        <span className="text-[10px]">名片</span>
       </button>
     </div>
   )

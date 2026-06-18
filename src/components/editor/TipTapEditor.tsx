@@ -5,7 +5,7 @@ import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 import { TextStyle } from '@tiptap/extension-text-style'
 import Color from '@tiptap/extension-color'
-import TiptapImage from '@tiptap/extension-image'
+import { WeChatImage } from '../../core/extensions/WeChatImage'
 import { useEditorStore } from '../../store/useEditorStore'
 import { markdownToHtml } from '../../core/editor/markdownConvert'
 import { WeChatHeading } from '../../core/extensions/WeChatHeading'
@@ -153,7 +153,7 @@ export function TipTapEditor() {
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
       TextStyle, Color,
-      TiptapImage.configure({ inline: false, allowBase64: true }),
+      WeChatImage.configure({ inline: false, allowBase64: true }),
     ],
     editorProps: {
       attributes: {
