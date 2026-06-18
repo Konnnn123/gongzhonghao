@@ -11,6 +11,7 @@ import { markdownToHtml } from '../../core/editor/markdownConvert'
 import { WeChatHeading } from '../../core/extensions/WeChatHeading'
 import { WeChatHighlight } from '../../core/extensions/WeChatHighlight'
 import { WeChatBold } from '../../core/extensions/WeChatBold'
+import { WeChatReference } from '../../core/extensions/WeChatReference'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
   WeChatParagraph, WeChatBulletList, WeChatOrderedList,
@@ -129,6 +130,7 @@ export function TipTapEditor() {
       WeChatBlockquote, WeChatHorizontalRule,
       WeChatHeading,
       WeChatBold,
+      WeChatReference,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
