@@ -12,7 +12,11 @@ import { WeChatHeading } from '../../core/extensions/WeChatHeading'
 import { WeChatHighlight } from '../../core/extensions/WeChatHighlight'
 import { WeChatBold } from '../../core/extensions/WeChatBold'
 import { WeChatReference } from '../../core/extensions/WeChatReference'
-import { WeChatTable, WeChatTableRow, WeChatTableHeader, WeChatTableCell } from '../../core/extensions/WeChatTable'
+import Table from '@tiptap/extension-table'
+import TableRow from '@tiptap/extension-table-row'
+import TableHeader from '@tiptap/extension-table-header'
+import TableCell from '@tiptap/extension-table-cell'
+import { TableStyleExtension } from '../../core/extensions/TableStyleExtension'
 import { TABLE_THEMES } from '../../core/themes/themeConfigs'
 import { convertHeadingsToWeChat } from '../../core/extensions/convertToWeChat'
 import {
@@ -66,16 +70,16 @@ function syncGlobalState(editor: any) {
       }
     }
 
-    // 表格 → 主题样式
+    // 表格 → 主题样式（通过 TableStyleExtension 的 inlineStyle 属性）
     const tableCfg = TABLE_THEMES[theme.tableTheme] || TABLE_THEMES.knowledge
     if (node.type === 'table') {
-      node.attrs = { ...node.attrs, style: tableCfg.table }
+      node.attrs = { ...node.attrs, inlineStyle: tableCfg.table }
     }
     if (node.type === 'tableHeader') {
-      node.attrs = { ...node.attrs, style: tableCfg.th }
+      node.attrs = { ...node.attrs, inlineStyle: tableCfg.th }
     }
     if (node.type === 'tableCell') {
-      node.attrs = { ...node.attrs, style: tableCfg.td }
+      node.attrs = { ...node.attrs, inlineStyle: tableCfg.td }
     }
 
     // 标记 → 高亮 + 加粗颜色
@@ -145,10 +149,12 @@ export function TipTapEditor() {
       WeChatHeading,
       WeChatBold,
       WeChatReference,
-      WeChatTable.configure({ resizable: false }),
-      WeChatTableRow,
-      WeChatTableHeader,
-      WeChatTableCell,
+      // 原生表格（100% 兼容 Word/粘贴/Markdown）
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      TableStyleExtension,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph', 'wechatHeading'] }),
       WeChatHighlight.configure({ multicolor: true }),
@@ -207,6 +213,10 @@ export function TipTapEditor() {
         .tiptap-editor code{background-color:#f2f3f5;padding:2px 6px;border-radius:3px;font-size:13px;color:#c41d7f;}
         .tiptap-editor pre{background-color:#f7f8fa;border-width:1px;border-style:solid;border-color:#e5e6eb;border-radius:6px;padding:16px;margin-top:16px;margin-bottom:16px;overflow-x:auto;font-size:13px;line-height:1.6;}
         .tiptap-editor pre code{background-color:transparent;padding:0;color:#1d2129;}
+        .tiptap-editor table{width:100%;border-collapse:collapse;margin:20px auto;table-layout:fixed;word-wrap:break-word;}
+        .tiptap-editor th{border:1px solid #E4E7ED;padding:10px 8px;background-color:#2B4A6F;color:white;font-weight:bold;text-align:left;}
+        .tiptap-editor td{border:1px solid #E4E7ED;padding:10px 8px;}
+        .tiptap-editor td p,.tiptap-editor th p{margin:0 !important;}
         .tiptap-editor table{display:table !important;width:100%;max-width:100%;margin:20px auto !important;border-collapse:collapse;table-layout:fixed;}
         .tiptap-editor td,.tiptap-editor th{min-width:1em;position:relative;}
         .tiptap-editor td p,.tiptap-editor th p{margin:0;}
