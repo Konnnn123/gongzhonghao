@@ -155,6 +155,13 @@ export function TipTapEditor() {
       transformPastedHTML: (html: string) => {
         return html.replace(/mso-[^:]+:[^;]+;?/gi, '')
       },
+      // 表格粘贴隔离：让原生 TipTap 处理，不走自定义插件
+      handlePaste: (_view: any, _event: any, slice: any) => {
+        if (slice.content.firstChild?.type?.name === 'table') {
+          return false // return false = 交给原生 TipTap 处理
+        }
+        return false
+      },
     },
   })
 

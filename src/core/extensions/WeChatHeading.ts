@@ -118,6 +118,11 @@ const autoNumberPlugin = new Plugin({
     let h2Counter = 1
 
     newState.doc.descendants((node: any, pos: number) => {
+      // 【免疫隔离】：表格内的节点绝对不碰
+      if (node.type.name === 'table' || node.type.name === 'tableCell' || node.type.name === 'tableHeader') {
+        return false // 返回 false 阻止递归进入表格内部
+      }
+
       if (node.type.name === 'wechatHeading' && node.attrs.headingLevel === 2) {
         if (node.attrs.index !== h2Counter) {
           tr = tr.setNodeMarkup(pos, undefined, { ...node.attrs, index: h2Counter })
