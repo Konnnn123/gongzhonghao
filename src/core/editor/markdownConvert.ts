@@ -134,6 +134,12 @@ export function markdownToHtml(markdown: string, h2Style?: string, h3Style?: str
       continue
     }
 
+    // 原始 HTML 块（如 <section data-type="ai-summary">）直接保留，不包 <p>
+    if (/^<\//.test(trimmed) || /^<(section|div|article|aside|header|footer|main|nav)[\s>]/i.test(trimmed)) {
+      htmlParts.push(trimmed)
+      continue
+    }
+
     // 普通段落
     htmlParts.push(`<p>${processInline(trimmed)}</p>`)
   }
@@ -144,8 +150,18 @@ export function markdownToHtml(markdown: string, h2Style?: string, h3Style?: str
   return htmlParts.join('\n')
 }
 
+/** 需要保留的 HTML 标签（不被 strip） */
+const PRESERVE_TAGS = ['section', 'strong', 'em', 'u', 'mark', 'ul', 'ol', 'li', 'p']
+
 function processInline(text: string): string {
   let r = text
+  // 先保护需要保留的 HTML 标签，用占位符替换
+  const preserved: string[] = []
+  r = r.replace(/<(\/?)(section|strong|em|u|mark|ul|ol|li|p)([^>]*)>/gi, (match) => {
+    preserved.push(match)
+    return `\x00PRESERVED_${preserved.length - 1}\x00`
+  })
+  // 正常 Markdown 内联转换
   r = r.replace(/`([^`]+)`/g, '<code>$1</code>')
   r = r.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
   r = r.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
@@ -154,6 +170,8 @@ function processInline(text: string): string {
   r = r.replace(/\*(.+?)\*/g, '<em>$1</em>')
   r = r.replace(/_(.+?)_/g, '<em>$1</em>')
   r = r.replace(/==(.*?)==/g, '<mark>$1</mark>')
+  // 还原被保护的 HTML 标签
+  r = r.replace(/\x00PRESERVED_(\d+)\x00/g, (_, i) => preserved[parseInt(i)])
   return r
 }
 
@@ -163,6 +181,12 @@ function escapeHtml(t: string): string {
 
 export function htmlToMarkdown(html: string): string {
   let md = html
+  // 先保护 <section> 块，防止后续正则误伤
+  const sectionBlocks: string[] = []
+  md = md.replace(/<section[\s\S]*?<\/section>/gi, (match) => {
+    sectionBlocks.push(match)
+    return `\x00SECTION_${sectionBlocks.length - 1}\x00`
+  })
   md = md.replace(/<p[^>]*>/g, '\n').replace(/<\/p>/g, '\n')
   md = md.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/g, '\n# $1\n')
   md = md.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/g, '\n## $1\n')
@@ -185,6 +209,8 @@ export function htmlToMarkdown(html: string): string {
   md = md.replace(/<code[^>]*>([\s\S]*?)<\/code>/g, '`$1`')
   md = md.replace(/<[^>]+>/g, '')
   md = md.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"')
+  // 还原 <section> 块
+  md = md.replace(/\x00SECTION_(\d+)\x00/g, (_, i) => sectionBlocks[parseInt(i)])
   md = md.replace(/\n{3,}/g, '\n\n')
   return md.trim()
 }

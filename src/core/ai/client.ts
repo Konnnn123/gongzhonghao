@@ -27,7 +27,7 @@ export async function callAI(
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: buildUserPrompt(markdown) },
       ],
-      temperature: 0.3,
+      temperature: 0.5,
       max_tokens: 8192,
     }),
   })
